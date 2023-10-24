@@ -71,3 +71,6 @@ class SignIn(BaseModel):
 class SignInResponse(BaseModel):
     token: str
     token_type: str
+
+class TokenData(BaseModel):
+    id: int

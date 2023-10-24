@@ -6,6 +6,7 @@ from .. import models
 from sqlalchemy.orm import Session
 from ..utils import hash_password, verify_pwd
 from ..oauth import create_access_token
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 """
 This files covers both user signup, login and
 logout authentication
@@ -45,7 +46,7 @@ def signup(user: UserSignUp, db: Session = Depends(get_db)):
 
 @router.post('/login', status_code=status.HTTP_200_OK,
             response_model=SignInResponse)
-def login(user: SignIn, db: Session=Depends(get_db)):
+def login(user:SignIn, db: Session=Depends(get_db)):
     user_cred = db.query(models.Users).filter(models.Users.email==user.email).first()
     if not user_cred:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
