@@ -15,10 +15,6 @@ router = APIRouter(
 )
 
 
-@router.get('/')
-def root():
-    return {'message': 'welcome to my api'}
-
 
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED,
