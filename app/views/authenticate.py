@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from ..database import get_db
-from ..schemas import UserSignUp, UserSignUpResponse
+from ..schemas import (UserSignUp, UserSignUpResponse,
+                       SignIn, SignInResponse)
 from .. import models
 from sqlalchemy.orm import Session
-from ..utils import hash_password
+from ..utils import hash_password, verify_pwd
+from ..oauth import create_access_token
 """
 This files covers both user signup, login and
 logout authentication
@@ -22,7 +24,9 @@ def root():
 @router.post("/signup", status_code=status.HTTP_201_CREATED,
              response_model=UserSignUpResponse)
 def signup(user: UserSignUp, db: Session = Depends(get_db)):
-
+    """
+        Register user to the app user signup authenitcation
+    """
     get_email = db.query(models.Users).filter(models.Users.email == user.email).first()
     get_phone = db.query(models.Users).filter(models.Users.phone_number == user.phone_number).\
                 first()
@@ -41,3 +45,19 @@ def signup(user: UserSignUp, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user_details)
     return user_details
+
+
+@router.post('/login', status_code=status.HTTP_200_OK,
+            response_model=SignInResponse)
+def login(user: SignIn, db: Session=Depends(get_db)):
+    user_cred = db.query(models.Users).filter(models.Users.email==user.email).first()
+    if not user_cred:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='email does not exist')
+    hashed_pwd = verify_pwd(user.password, user_cred.password) 
+    if not hashed_pwd:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail='Incorrect password') 
+
+    access_token = create_access_token({'user_id': user_cred.id})
+    return {'token': access_token, 'token_type': "Bearer"}

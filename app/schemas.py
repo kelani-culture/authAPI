@@ -1,4 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field, validator, model_validator
+from pydantic import (BaseModel, EmailStr, Field, validator,
+                      model_validator) 
+from datetime  import datetime
 import re
 
 """
@@ -56,6 +58,16 @@ class UserSignUpResponse(BaseModel):
     last_name: str
     email: EmailStr
     phone_number: str
+    created_at: datetime
 
     class Config:
         orm_mode = True
+
+
+class SignIn(BaseModel):
+    email: EmailStr
+    password: str
+
+class SignInResponse(BaseModel):
+    token: str
+    token_type: str
