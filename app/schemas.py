@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import (BaseModel, EmailStr, Field, validator,
                       model_validator) 
 from datetime  import datetime
@@ -6,6 +7,8 @@ import re
 """
 shcemas for our application
 """
+
+# user schema
 name_regex = "^[a-zA-Z]+$"
 # Minimum eight characters, at least one uppercase letter,
 # one lowercase letter, one number and one special character:
@@ -28,7 +31,7 @@ class UserSignUp(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
     confirm_password: str = Field(min_length=8)
-
+    username: str
     @model_validator(mode='after')
     def validate_password(self):
         pwd1 = self.password
@@ -49,6 +52,10 @@ class UserSignUp(BaseModel):
         if not match:
             raise ValueError('Invalid phone number')
         return num
+    is_active: bool = False
+    is_superuser: bool = False
+    is_admin: bool = False
+    is_verified: bool = False
 
 
 class UserSignUpResponse(BaseModel):
@@ -56,8 +63,11 @@ class UserSignUpResponse(BaseModel):
     id: int
     first_name: str
     last_name: str
+    username: str
     email: EmailStr
     phone_number: str
+    is_superuser: bool = False
+    is_admin: bool = False
     created_at: datetime
 
     class Config:
@@ -74,3 +84,19 @@ class SignInResponse(BaseModel):
 
 class TokenData(BaseModel):
     id: int
+    is_admin: bool
+    is_super: bool
+
+# product schema
+class Product(BaseModel):
+    name: str
+    description: str
+    quantity: int = 0
+    price: float
+
+class Productscheme(Product):
+    user_id: int
+
+class ProductResponse(BaseModel):
+    message: str = Field(default="Product created successfully")
+    products: Productscheme

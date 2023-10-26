@@ -22,9 +22,11 @@ def verify_token(token: str, credential_exception):
     try:
         token_decode = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id = token_decode.get('user_id')
-        if id is None:
+        is_super = token_decode.get('is_super')
+        is_admin = token_decode.get('is_admin')
+        if id is None or is_super is None or is_admin is None:
             raise credential_exception
-        data = TokenData(id=id)
+        data = TokenData(id=id, is_super=is_super, is_admin=is_admin)
     except JWTError:
         raise credential_exception
     return data
