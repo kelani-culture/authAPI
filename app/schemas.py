@@ -10,11 +10,13 @@ shcemas for our application
 
 # user schema
 name_regex = "^[a-zA-Z]+$"
+
 # Minimum eight characters, at least one uppercase letter,
 # one lowercase letter, one number and one special character:
 pass_regex ="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
 phone_regex="^[0-9]+$"
  
+
 
 class UserSignUp(BaseModel):
     first_name: str = Field(min_length=3)
@@ -44,7 +46,7 @@ class UserSignUp(BaseModel):
             raise ValueError('passwords do not match')
 
         return self
-     
+ 
     phone_number: str = Field(min_length=11)
     @validator('phone_number')
     def validate_number(cls, num):
@@ -73,6 +75,11 @@ class UserSignUpResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class UserAdminResponse(BaseModel):
+    id: int
+    username: str
+    phone_number: str
+    email: EmailStr
 
 class SignIn(BaseModel):
     email: EmailStr
@@ -100,3 +107,14 @@ class Productscheme(Product):
 class ProductResponse(BaseModel):
     message: str = Field(default="Product created successfully")
     products: Productscheme
+
+class GetProduct(BaseModel):
+    name: str
+    description: str
+    quantity: int
+    price: float
+    seller: UserAdminResponse
+    created_at: datetime
+
+    class Config:
+        orm_mode =True

@@ -1,8 +1,9 @@
+from typing import List
 from fastapi import (APIRouter, status,
                      Depends, HTTPException)
 from ..database import get_db
 from .. import models
-from ..schemas import Product, ProductResponse
+from ..schemas import Product, ProductResponse, GetProduct
 from ..oauth import get_current_user
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,8 @@ router = APIRouter(
 )
 
 
-@router.post('/create-products')
+@router.post('/create-products', status_code=status.HTTP_201_CREATED,
+             response_model=ProductResponse)
 def create_product(prod: Product, current_user: int = Depends(get_current_user), db: Session = Depends(get_db)):
     if current_user.is_admin is False:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -25,6 +27,12 @@ def create_product(prod: Product, current_user: int = Depends(get_current_user),
     db.refresh(to_prod)
     return {'message': 'product created successfully', 'products': to_prod}
 
-@router.get('/products')
-def get_product(current_user: int = Depends(get_current_user)):
-    return {'message': 'authenticated user'}
+
+
+
+@router.get('/products', status_code=status.HTTP_200_OK,
+            response_model=List[GetProduct])
+def get_product(db: Session = Depends(get_db),
+                current_user: int = Depends(get_current_user)):
+    prod = db.query(models.Product).all()
+    return prod

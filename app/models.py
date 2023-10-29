@@ -37,3 +37,4 @@ class Product(Base):
                         nullable=False,
                         server_default=text("now()"))
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
+    seller = relationship("Users")
