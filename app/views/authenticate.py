@@ -9,7 +9,7 @@ from ..oauth import create_access_token
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from fastapi.responses import HTMLResponse
 from ..oauth import verify_token
-from email_utils import *
+from mails import *
 """
 This files covers both user signup, login and
 logout authentication
