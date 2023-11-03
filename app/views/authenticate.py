@@ -80,16 +80,16 @@ async def verify_email(request: Request, token: str, db: Session = Depends(get_d
                                         {"request": request,
                                         "username": user.username})
 
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid token or expired token",
-        headers={"www-Authenticate": "Bearer"}
-    )
+    raise credentials_exception
 
 @router.post('/login', status_code=status.HTTP_200_OK,
             response_model=SignInResponse)
-async def login(user:OAuth2PasswordRequestForm=Depends(), db: Session=Depends(get_db)):
+async def login(user:OAuth2PasswordRequestForm=Depends(), db: Session=Depends(get_db)): 
     user_cred = db.query(models.Users).filter(models.Users.email==user.username).first()
+    
+    if user_cred.is_valid is False:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail='email not verified')
     if not user_cred:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail='Invalid email or password')
