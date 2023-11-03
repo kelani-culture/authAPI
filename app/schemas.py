@@ -17,7 +17,6 @@ pass_regex ="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}
 phone_regex="^[0-9]+$"
  
 
-
 class UserSignUp(BaseModel):
     first_name: str = Field(min_length=3)
     last_name: str = Field(min_length=3)
@@ -54,11 +53,7 @@ class UserSignUp(BaseModel):
         if not match:
             raise ValueError('Invalid phone number')
         return num
-    is_active: bool = False
-    is_superuser: bool = False
     is_admin: bool = False
-    is_verified: bool = False
-
 
 class UserSignUpResponse(BaseModel):
     message: str = Field(default='User created successfully') 
@@ -68,8 +63,6 @@ class UserSignUpResponse(BaseModel):
     username: str
     email: EmailStr
     phone_number: str
-    is_superuser: bool = False
-    is_admin: bool = False
     created_at: datetime
 
     class Config:
@@ -102,6 +95,7 @@ class Product(BaseModel):
     price: float
 
 class Productscheme(Product):
+    id: int
     user_id: int
 
 class ProductResponse(BaseModel):
@@ -109,6 +103,7 @@ class ProductResponse(BaseModel):
     products: Productscheme
 
 class GetProduct(BaseModel):
+    id: int
     name: str
     description: str
     quantity: int
@@ -118,3 +113,9 @@ class GetProduct(BaseModel):
 
     class Config:
         orm_mode =True
+
+
+class TokenData(BaseModel):
+    id: int = None
+    is_verified: bool = None
+    username: str = None
